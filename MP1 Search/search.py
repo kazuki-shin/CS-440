@@ -14,6 +14,7 @@ within this file -- the unrevised staff files will be used for all other
 files and classes when code is run, so be careful to not modify anything else.
 """
 
+
 # Search should return the path and the number of states explored.
 # The path should be a list of tuples in the form (row, col) that correspond
 # to the positions of the path taken by your search algorithm.
@@ -140,35 +141,15 @@ def greedy(maze):
 def astar(maze):
     # TODO: Write your code here
     # return path, num_states_explored
-    i = 0
-    mst = []
-    objectives=maze.getObjectives()
-    mst.append(maze.getStart())
-    minDist = 100000000000000000000000
-    min = maze.getStart()
+    i=0
     start= maze.getStart()
-
-    # creating mst
-    while len(mst) < len(maze.getObjectives()):
-         for obj in objectives:
-             dist = abs((obj[0]-start[0]))+abs((obj[1]-start[1]))
-             if dist < minDist:
-                 minDist = 100000000000000000000000
-                 min = obj
-         mst.append(min)
-         index = objectives.index(min)
-         del objectives[index]
-
-
     minDist=100000000000000000000000
     print(maze.getObjectives())
     print(start)
-    # for obj in maze.getObjectives():
-    #     if abs((obj[0]-start[0]))+abs((obj[1]-start[1]))<minDist: #((obj[0]-start[0])**2 + (obj[1]-start[1])**2)**2<minDist:
-    #         minDist=abs((obj[0]-start[0]))+abs((obj[1]-start[1]))#((obj[0]-start[0])**2 + (obj[1]-start[1])**2)**2
-    #         goal=obj
-    goal = mst.pop(0)
-
+    for obj in maze.getObjectives():
+        if abs((obj[0]-start[0]))+abs((obj[1]-start[1]))<minDist: #((obj[0]-start[0])**2 + (obj[1]-start[1])**2)**2<minDist:
+            minDist=abs((obj[0]-start[0]))+abs((obj[1]-start[1]))#((obj[0]-start[0])**2 + (obj[1]-start[1])**2)**2
+            goal=obj
     print(goal)
     visited = {}
     heap= []
@@ -209,12 +190,10 @@ def astar(maze):
                 break
             print(objectives)
             minDist=100000000000000000000000
-            # for obj in objectives:
-            #     if abs((obj[0]-state[0]))+abs((obj[1]-state[1]))<minDist:#((obj[0]-state[0])**2 + (obj[1]-state[1])**2)**2<minDist:
-            #         minDist=abs((obj[0]-state[0]))+abs((obj[1]-state[1]))#((obj[0]-state[0])**2 + (obj[1]-state[1])**2)**2
-            #         goal=obj
-
-
+            for obj in objectives:
+                if abs((obj[0]-state[0]))+abs((obj[1]-state[1]))<minDist:#((obj[0]-state[0])**2 + (obj[1]-state[1])**2)**2<minDist:
+                    minDist=abs((obj[0]-state[0]))+abs((obj[1]-state[1]))#((obj[0]-state[0])**2 + (obj[1]-state[1])**2)**2
+                    goal=obj
             print(goal)
             visited={}
             parent={}
