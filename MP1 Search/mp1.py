@@ -4,7 +4,7 @@
 # educational purposes provided that (1) you do not distribute or publish
 # solutions, (2) you retain this notice, and (3) you provide clear
 # attribution to the University of Illinois at Urbana-Champaign
-# 
+#
 # Created by Michael Abir (abir2@illinois.edu) on 08/28/2018
 # Modified by Rahul Kunji (rahulsk2@illinois.edu) on 01/16/2019
 
@@ -32,19 +32,19 @@ class Application:
         self.fps = fps
         self.windowTitle = "CS440 MP1: "
         self.__human = human
-    
+
     # Initializes the pygame context and certain properties of the maze
     def initialize(self, filename):
         self.windowTitle += filename
 
         self.maze = Maze(filename)
         self.gridDim = self.maze.getDimensions()
-        
+
         self.windowHeight = self.gridDim[0] * self.scale
         self.windowWidth = self.gridDim[1] * self.scale
 
-        self.blockSizeX = int(self.windowWidth / self.gridDim[1])
-        self.blockSizeY = int(self.windowHeight / self.gridDim[0])
+        self.blockSizeX = int((self.windowWidth/6*5) / self.gridDim[1])
+        self.blockSizeY = int((self.windowHeight/6*5) / self.gridDim[0])
 
         if self.__human:
             self.agentRadius = min(self.blockSizeX, self.blockSizeY) / 4
@@ -53,13 +53,13 @@ class Application:
     # Once the application is initiated, execute is in charge of drawing the game and dealing with the game loop
     def execute(self, filename, searchMethod, save):
         self.initialize(filename)
-                    
+
         if self.maze is None:
             print("No maze created")
             raise SystemExit
-            
-        if not self.__human:            
-            path, statesExplored = search(self.maze, searchMethod)            
+
+        if not self.__human:
+            path, statesExplored = search(self.maze, searchMethod)
         else:
             path, statesExplored = [], 0
 
@@ -76,7 +76,7 @@ class Application:
             print("Path Length:", len(path))
             print("States Explored:", statesExplored)
             self.drawPath(path)
-            
+
         self.drawMaze()
         self.drawStart()
         self.drawObjective()
@@ -85,12 +85,12 @@ class Application:
         if save is not None:
             pygame.image.save(self.displaySurface, save)
             self.running = False
-        
+
         clock = pygame.time.Clock()
 
         while self.running:
-            pygame.event.pump()            
-            keys = pygame.key.get_pressed()            
+            pygame.event.pump()
+            keys = pygame.key.get_pressed()
             clock.tick(self.fps)
 
             if (keys[K_ESCAPE]):
@@ -111,9 +111,9 @@ class Application:
                     self.agent.moveUp()
 
                 if (keys[K_DOWN]):
-                    self.agent.moveDown()                        
+                    self.agent.moveDown()
 
-                self.gameLoop()                
+                self.gameLoop()
 
 
     # The game loop is where everything is drawn to the context. Only called when a human is playing
@@ -192,10 +192,10 @@ class Application:
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='CS440 MP1 Search')
-    
+
     parser.add_argument('filename',
                         help='path to maze file [REQUIRED]')
-    parser.add_argument('--method', dest="search", type=str, default = "bfs", 
+    parser.add_argument('--method', dest="search", type=str, default = "bfs",
                         choices = ["bfs", "dfs", "greedy", "astar"],
                         help='search method - default bfs')
     parser.add_argument('--scale', dest="scale", type=int, default = 20,
@@ -204,9 +204,9 @@ if __name__ == "__main__":
                         help='fps for the display - default 30')
     parser.add_argument('--human', default = False, action = "store_true",
                         help='flag for human playable - default False')
-    parser.add_argument('--save', dest="save", type=str, default = None, 
+    parser.add_argument('--save', dest="save", type=str, default = None,
                         help='save output to image file - default not saved')
-    
+
 
     args = parser.parse_args()
     app = Application(args.human, args.scale, args.fps)
