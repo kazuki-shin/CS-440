@@ -165,6 +165,10 @@ def astar(maze):
         cur = heapq.heappop(heap)
         g = cur[0] + 1
         state= cur[1]
+        for obj in objectives:
+            if abs((obj[0]-state[0]))+abs((obj[1]-state[1]))<minDist:#((obj[0]-state[0])**2 + (obj[1]-state[1])**2)**2<minDist:
+                minDist=abs((obj[0]-state[0]))+abs((obj[1]-state[1]))#((obj[0]-state[0])**2 + (obj[1]-state[1])**2)**2
+                goal=obj
         #print(parent)
         #print(visited)
         if state==goal:
