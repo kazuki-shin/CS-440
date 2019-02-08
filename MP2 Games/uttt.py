@@ -55,10 +55,49 @@ class ultimateTicTacToe:
         output:
         score(float): estimated utility score for maxPlayer or minPlayer
         """
-        #YOUR CODE HERE
         score=0
+        # predefined offensive agent
+        if isMax:
+            #first rule
+            if checkWinner() is 1:
+                score += winnerMaxUtility
+                return score
+            #second rule
+            if countTwoInARow() not 0 or countPreventThreeInARow() not 0:
+                score += twoInARowMaxUtility * countTwoInARow()
+                score += preventThreeInARowMaxUtility * countPreventThreeInARow()
+                return score
+            #third rule
+            score += cornerMaxUtility * countCornerTaken()
+        #predefined defensive agent
+        else:
+            #first rule
+            if checkWinner() is -1:
+                score += winnerMinUtility
+                return score
+            #second rule
+            if countTwoInARow() not 0 or countPreventThreeInARow() not 0:
+                score += twoInARowMinUtility * countTwoInARow()
+                score += preventThreeInARowMinUtility * countPreventThreeInARow()
+                return score
+            #third rule
+            score += cornerMinUtility * countCornerTaken()
         return score
 
+    # num of unblocked two-in-a-row
+    def countTwoInARow(self):
+        cnt = 0
+        return cnt
+
+    # num of blocks prevent tinghe opponent player from forming two-in-a-row
+    def countPreventThreeInARow(self):
+        cnt = 0
+        return cnt
+
+    # num of corners taken
+    def countCornerTaken(self):
+        cnt = 0
+        return cnt
 
     def evaluateDesigned(self, isMax):
         """
@@ -82,6 +121,11 @@ class ultimateTicTacToe:
         """
         #YOUR CODE HERE
         movesLeft=True
+        for i in board:
+            for j in i:
+                if j is "_":
+                    return movesLeft
+        movesLeft = False
         return movesLeft
 
     def checkWinner(self):
@@ -94,7 +138,67 @@ class ultimateTicTacToe:
                      Return -1 if miniPlayer is the winner.
         """
         #YOUR CODE HERE
-        winner=0
+        for tuple in range(len(globalIdx)):
+            deltY = tuple[0]
+            deltX = tuple[1]
+            # X.-.-
+            # X.-.-
+            # X.-.-
+            if board[0+deltY][deltX] == board[1+deltY][deltX] == board [2+deltY][deltX]:
+                if board[0+deltY][deltX]=="X":
+                    return 1
+                else:
+                    return -1
+            # -.X.-
+            # -.X.-
+            # -.X.-
+            if board[0+deltY][1+deltX] == board[1+deltY][1+deltX] == board [2+deltY][1+deltX]:
+                if board[0+deltY][1+deltX]=="X":
+                    return 1
+                return -1
+            # -.-.X
+            # -.-.X
+            # -.-.X
+            if board[0+deltY][2+deltX] == board[1+deltY][2+deltX] == board [2+deltY][2+deltX]:
+                if board[0+deltY][2+deltX]=="X":
+                    return 1
+                return -1
+            # X.X.X
+            # -.-.-
+            # -.-.-
+            if board[deltY][0+deltX] == board[deltY][1+deltX] == board [deltY][2+deltX]:
+                if board[deltY][0+deltX]=="X":
+                    return 1
+                return -1
+            # -.-.-
+            # X.X.X
+            # -.-.-
+            if board[1+deltY][0+deltX] == board[1+deltY][1+deltX] == board [1+deltY][2+deltX]:
+                if board[1+deltY][1+deltX]=="X":
+                    return 1
+                return -1
+            # -.-.-
+            # -.-.-
+            # X.X.X
+            if board[2+deltY][0+deltX] == board[2+deltY][1+deltX] == board [2+deltY][2+deltX]:
+                if board[2+deltY][0+deltX]=="X":
+                    return 1
+                return -1
+            # X.-.-
+            # -.X.-
+            # -.-.X
+            if board[deltY][deltX] == board[1+deltY][1+deltX] == board[2+deltY][2+deltX]
+                if board[deltX][deltY]=="X":
+                    return 1
+                return -1
+            # -.-.X
+            # -.X.-
+            # X.-.-
+            if board[2+deltY][deltX] == board[1+deltY][1+deltX] == board[deltY][2+deltX]
+                if board[1+deltX][1+deltY]=="X":
+                    return 1
+                return -1
+
         return 0
 
     def alphabeta(self,depth,currBoardIdx,alpha,beta,isMax):
@@ -128,6 +232,14 @@ class ultimateTicTacToe:
         bestValue(float):the bestValue that current player may have
         """
         #YOUR CODE HERE
+        if isMax:
+            if board[currBoardIdx]>alpha:
+                alpha=board[currBoardIdx]
+            return alpha
+        else:
+            if board[currBoardIdx]<beta:
+                beta=board[currBoardIdx]
+            return beta
         bestValue=0.0
         return bestValue
 
