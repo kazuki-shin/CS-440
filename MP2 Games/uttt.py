@@ -37,6 +37,9 @@ class ultimateTicTacToe:
         self.preventThreeInARowMinUtility=-500
         self.cornerMinUtility=-30
 
+        self.expandedNodes=0
+        self.currPlayer=True
+
     def printGameBoard(self):
         """
         This function prints the current game board.
@@ -119,7 +122,6 @@ class ultimateTicTacToe:
         movesLeft(bool): boolean variable indicates whether any legal move remains
                         on the board.
         """
-        #YOUR CODE HERE
         movesLeft=True
         for i in board:
             for j in i:
@@ -137,7 +139,6 @@ class ultimateTicTacToe:
                      Return 1 if maxPlayer is the winner.
                      Return -1 if miniPlayer is the winner.
         """
-        #YOUR CODE HERE
         for tuple in range(len(globalIdx)):
             deltY = tuple[0]
             deltX = tuple[1]
@@ -198,7 +199,6 @@ class ultimateTicTacToe:
                 if board[1+deltX][1+deltY]=="X":
                     return 1
                 return -1
-
         return 0
 
     def alphabeta(self,depth,currBoardIdx,alpha,beta,isMax):
@@ -231,7 +231,6 @@ class ultimateTicTacToe:
         output:
         bestValue(float):the bestValue that current player may have
         """
-        #YOUR CODE HERE
         if isMax:
             if board[currBoardIdx]>alpha:
                 alpha=board[currBoardIdx]
@@ -243,13 +242,15 @@ class ultimateTicTacToe:
         bestValue=0.0
         return bestValue
 
-    def playGamePredifinedAgent(self,maxFirst,isMinimax):
+    def playGamePredifinedAgent(self,maxFirst,isMinimaxOffensive,isMinimaxDefensive):
         """
         This function implements the processes of the game of predifined offensive agent vs defensive agent.
         input args:
         maxFirst(bool): boolean variable indicates whether maxPlayer or minPlayer plays first.
                         True for maxPlayer plays first, and False for minPlayer plays first.
-        isMinimax(bool):boolean variable indicates whether it's using minimax or alpha-beta pruning algorithm.
+        isMinimaxOffensive(bool):boolean variable indicates whether it's using minimax or alpha-beta pruning algorithm for offensive agent.
+                        True is minimax and False is alpha-beta.
+        isMinimaxOffensive(bool):boolean variable indicates whether it's using minimax or alpha-beta pruning algorithm for defensive agent.
                         True is minimax and False is alpha-beta.
         output:
         bestMove(list of tuple): list of bestMove coordinates at each step
@@ -297,7 +298,7 @@ class ultimateTicTacToe:
 
 if __name__=="__main__":
     uttt=ultimateTicTacToe()
-    gameBoards, bestMove, bestValue, winner=uttt.playGamePredifinedAgent()
+    gameBoards, bestMove, expandedNodes, bestValue, winner=uttt.playGamePredifinedAgent(True,False,False)
     if winner == 1:
         print("The winner is maxPlayer!!!")
     elif winner == -1:

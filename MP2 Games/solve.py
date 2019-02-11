@@ -7,11 +7,14 @@ def add_pentomino(board, pent, coord, check_pent=False, valid_pents=None):
     for row in range(pent.shape[0]):
         for col in range(pent.shape[1]):
             if pent[row][col] != 0:
-                if board[coord[0]+row][coord[1]+col] != 0: # Overlap
+                if board[coord[0]+row][coord[1]+col] != 1: # Overlap
                     return False
                 else:
                     board[coord[0]+row][coord[1]+col] = pent[row][col]
     return True
+
+def remove_pentomino(board, pent_idx):
+    board[board==pent_idx+1] = 0
 
 def solve(board, pents, app=None):
     """
@@ -56,55 +59,55 @@ def solve_helper(board, pents, pents_used, solution):
     for i in pents:
         print(solution)
         if add_pentomino(board, i, coord):
-            pent_used.append(i)
+            pents_used.append(i)
             sol = (i, (coord[0], coord[1]))
             solution.append(sol)
             pents.remove(i)
             solve_helper(board, pents, pents_used, solution)
         if add_pentomino(board, np.rot90(i), coord):
-            pent_used.append(np.rot90(i))
+            pents_used.append(np.rot90(i))
             sol = (np.rot90(i), (coord[0], coord[1]))
             solution.append(sol)
             if i in pents:
                 pents.remove(i)
             solve_helper(board, pents, pents_used, solution)
         if add_pentomino(board, np.rot90(np.rot90(i)), coord):
-            pent_used.append(np.rot90(np.rot90(i)))
+            pents_used.append(np.rot90(np.rot90(i)))
             sol = (np.rot90(np.rot90(i)), (coord[0], coord[1]))
             solution.append(sol)
             if i in pents:
                 pents.remove(i)
             solve_helper(board, pents, pents_used, solution)
         if add_pentomino(board, np.rot90(np.rot90(np.rot90(i))), coord):
-            pent_used.append(np.rot90(np.rot90(np.rot90(i))))
+            pents_used.append(np.rot90(np.rot90(np.rot90(i))))
             sol = (np.rot90(np.rot90(np.rot90(i))), (coord[0], coord[1]))
             solution.append(sol)
             if i in pents:
                 pents.remove(i)
             solve_helper(board, pents, pents_used, solution)
         if add_pentomino(board, np.flip(i, 0), coord):
-            pent_used.append(np.flip(i, 0))
+            pents_used.append(np.flip(i, 0))
             sol = (np.flip(i, 0), (coord[0], coord[1]))
             solution.append(sol)
             if i in pents:
                 pents.remove(i)
             solve_helper(board, pents, pents_used, solution)
         if add_pentomino(board, np.rot90(np.flip(i, 0)), coord):
-            pent_used.append(np.rot90(np.flip(i, 0)))
+            pents_used.append(np.rot90(np.flip(i, 0)))
             sol = (np.rot90(np.flip(i, 0)), (coord[0], coord[1]))
             solution.append(sol)
             if i in pents:
                 pents.remove(i)
             solve_helper(board, pents, pents_used, solution)
         if add_pentomino(board, np.rot90(np.rot90(np.flip(i, 0))), coord):
-            pent_used.append(np.rot90(np.rot90(np.flip(i, 0))))
+            pents_used.append(np.rot90(np.rot90(np.flip(i, 0))))
             sol = (np.rot90(np.rot90(np.flip(i, 0))), (coord[0], coord[1]))
             solution.append(sol)
             if i in pents:
                 pents.remove(i)
             solve_helper(board, pents, pents_used, solution)
         if add_pentomino(board, np.rot90(np.rot90(np.rot90(np.flip(i, 0)))), coord):
-            pent_used.append(np.rot90(np.rot90(np.rot90(np.flip(i, 0)))))
+            pents_used.append(np.rot90(np.rot90(np.rot90(np.flip(i, 0)))))
             sol = (np.rot90(np.rot90(np.rot90(np.flip(i, 0)))), (coord[0], coord[1]))
             solution.append(sol)
             if i in pents:
@@ -117,7 +120,7 @@ def solve_helper(board, pents, pents_used, solution):
             solution.pop()
         if pents_used:
             pents.append(pents_used.pop())
-            remove_pentomino(pents[-1])
+            remove_pentomino(pents[-1], -1)
         if not pents_used:
             a = pents[0]
             del pents[0]
