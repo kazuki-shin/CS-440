@@ -78,10 +78,10 @@ class ultimateTicTacToe:
                 child.locIdx = i*3+j
                 if uttt.board[child.coord[0]][child.coord[1]]=="_":
                     node.children.append(child)
-                    if isMax:
-                        uttt.board[child.coord[0]][child.coord[1]]="X"
-                    else:
-                        uttt.board[child.coord[0]][child.coord[1]]="O"
+                    # if isMax:
+                    #     uttt.board[child.coord[0]][child.coord[1]]="X"
+                    # else:
+                    #     uttt.board[child.coord[0]][child.coord[1]]="O"
                     num_child+=1
                 y+=1
                 curr_board=(x, y)
@@ -355,7 +355,7 @@ class ultimateTicTacToe:
     #         bestValue=minVal
     #     return bestValue
 
-    def minimax(self, depth, currBoardIdx, isMax, node):
+    def minimax(self, depth, currBoardIdx, isMax):
         """
         This function implements minimax algorithm for ultimate tic-tac-toe game.
         input args:
@@ -370,12 +370,10 @@ class ultimateTicTacToe:
         """
         #creating tree
         #print("depth: "+str( depth))
-        if depth>=3:
+        if depth>=3 or uttt.checkWinner(isMax):
             return uttt.evaluatePredifined(isMax)
         uttt.createTree(node, currBoardIdx, isMax)
         #print("child size: "+str( len(node.children)))
-        if len(node.children) == 0:
-            return uttt.evaluatePredifined(isMax)
         if isMax:
             bestValue=-float("inf")
             maxVal=-float("inf")
@@ -445,14 +443,14 @@ class ultimateTicTacToe:
         root.coord=(1,1)
         root.locIdx=4
         bestValue = uttt.minimax(0, root.locIdx, isMax, root)
-        if isMax:
-            uttt.board[uttt.curBestMove1.coord[0]][uttt.curBestMove1.coord[1]]='X'
-            uttt.board[uttt.curBestMove2.coord[0]][uttt.curBestMove2.coord[1]]='O'
-            uttt.board[uttt.curBestMove3.coord[0]][uttt.curBestMove3.coord[1]]='X'
-        else:
-            uttt.board[uttt.curBestMove1.coord[0]][uttt.curBestMove1.coord[1]]='O'
-            uttt.board[uttt.curBestMove2.coord[0]][uttt.curBestMove2.coord[1]]='X'
-            uttt.board[uttt.curBestMove3.coord[0]][uttt.curBestMove3.coord[1]]='O'
+        # if isMax:
+        #     uttt.board[uttt.curBestMove1.coord[0]][uttt.curBestMove1.coord[1]]='X'
+        #     # uttt.board[uttt.curBestMove2.coord[0]][uttt.curBestMove2.coord[1]]='O'
+        #     # uttt.board[uttt.curBestMove3.coord[0]][uttt.curBestMove3.coord[1]]='X'
+        # else:
+        #     uttt.board[uttt.curBestMove1.coord[0]][uttt.curBestMove1.coord[1]]='O'
+        #     # uttt.board[uttt.curBestMove2.coord[0]][uttt.curBestMove2.coord[1]]='X'
+        #     # uttt.board[uttt.curBestMove3.coord[0]][uttt.curBestMove3.coord[1]]='O'
         for triplet in uttt.board:
             print(triplet)
         while uttt.checkWinner()==0:
@@ -461,14 +459,14 @@ class ultimateTicTacToe:
             uttt.curBestMove2=Tree()
             uttt.curBestMove3=Tree()
             bestValue = uttt.minimax(0, temp.locIdx, isMax, temp)
-            if isMax:
-                uttt.board[uttt.curBestMove1.coord[0]][uttt.curBestMove1.coord[1]]='X'
-                uttt.board[uttt.curBestMove2.coord[0]][uttt.curBestMove2.coord[1]]='O'
-                uttt.board[uttt.curBestMove3.coord[0]][uttt.curBestMove3.coord[1]]='X'
-            else:
-                uttt.board[uttt.curBestMove1.coord[0]][uttt.curBestMove1.coord[1]]='O'
-                uttt.board[uttt.curBestMove2.coord[0]][uttt.curBestMove2.coord[1]]='X'
-                uttt.board[uttt.curBestMove3.coord[0]][uttt.curBestMove3.coord[1]]='O'
+            # if isMax:
+            #     uttt.board[uttt.curBestMove1.coord[0]][uttt.curBestMove1.coord[1]]='X'
+            #     # uttt.board[uttt.curBestMove2.coord[0]][uttt.curBestMove2.coord[1]]='O'
+            #     # uttt.board[uttt.curBestMove3.coord[0]][uttt.curBestMove3.coord[1]]='X'
+            # else:
+            #     uttt.board[uttt.curBestMove1.coord[0]][uttt.curBestMove1.coord[1]]='O'
+            #     # uttt.board[uttt.curBestMove2.coord[0]][uttt.curBestMove2.coord[1]]='X'
+            #     # uttt.board[uttt.curBestMove3.coord[0]][uttt.curBestMove3.coord[1]]='O'
             # if isMax:
             #     uttt.board[uttt.curBestMove.coord[0]][uttt.curBestMove.coord[1]]='X'
             # else:
