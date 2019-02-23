@@ -45,8 +45,15 @@ class ultimateTicTacToe:
 
         self.expandedNodes=0
         self.currPlayer=True
+<<<<<<< HEAD
 
         self.curBestMove=(0,0)
+=======
+        self.curBestMove=Tree()
+        self.curBestMove1=Tree()
+        self.curBestMove2=Tree()
+        self.curBestMove3=Tree()
+>>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
 
     def printGameBoard(self):
         """
@@ -76,10 +83,17 @@ class ultimateTicTacToe:
                 child.locIdx = i*3+j
                 if uttt.board[child.coord[0]][child.coord[1]]=="_":
                     node.children.append(child)
+<<<<<<< HEAD
                     if isMax:
                         uttt.board[child.coord[0]][child.coord[1]]="X"
                     else:
                         uttt.board[child.coord[0]][child.coord[1]]="O"
+=======
+                    # if isMax:
+                    #     uttt.board[child.coord[0]][child.coord[1]]="X"
+                    # else:
+                    #     uttt.board[child.coord[0]][child.coord[1]]="O"
+>>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
                     num_child+=1
                 y+=1
                 curr_board=(x, y)
@@ -368,29 +382,51 @@ class ultimateTicTacToe:
         """
         #creating tree
         #print("depth: "+str( depth))
+<<<<<<< HEAD
         if depth>=3:
             return uttt.evaluatePredifined(isMax)
         uttt.createTree(node, currBoardIdx, isMax)
         #print("child size: "+str( len(node.children)))
         if len(node.children) == 0:
             return uttt.evaluatePredifined(isMax)
+=======
+        if depth>=3 or uttt.checkWinner(isMax):
+            return uttt.evaluatePredifined(isMax)
+        uttt.createTree(node, currBoardIdx, isMax)
+        #print("child size: "+str( len(node.children)))
+>>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
         if isMax:
             bestValue=-float("inf")
             maxVal=-float("inf")
             for child in node.children:
                 eval=uttt.minimax(depth+1, child.locIdx, not isMax, child)
+<<<<<<< HEAD
                 uttt.board[child.coord[0]][child.coord[1]]="_"
                 if eval>maxVal:
                     uttt.curBestMove=child
                     #print(uttt.curBestMove)
                     maxVal=eval
                     print("max: "+str(maxVal))
+=======
+                # uttt.board[child.coord[0]][child.coord[1]]="_"
+                if eval>maxVal:
+                    if uttt.curBestMove.coord is not None:
+                        uttt.board[uttt.curBestMove.coord[0]][uttt.curBestMove.coord[1]]="_"
+                    uttt.curBestMove=child
+                    uttt.board[uttt.curBestMove.coord[0]][uttt.curBestMove.coord[1]]="X"
+                    #print(uttt.curBestMove)
+                    maxVal=eval
+                    # print("max: "+str(maxVal))
+                else:
+                    uttt.board[child.coord[0]][child.coord[1]]="_"
+>>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
             bestValue=maxVal
         else:
             bestValue=float("inf")
             minVal=float("inf")
             for child in node.children:
                 eval=uttt.minimax(depth+1, child.locIdx, not isMax, child)
+<<<<<<< HEAD
                 uttt.board[child.coord[0]][child.coord[1]]="_"
                 if eval<minVal:
                     uttt.curBestMove=child
@@ -400,6 +436,30 @@ class ultimateTicTacToe:
             bestValue=minVal
         print("best: "+str(bestValue))
         print()
+=======
+                # uttt.board[child.coord[0]][child.coord[1]]="_"
+                if eval<minVal:
+                    # print("here")
+                    if uttt.curBestMove.coord is not None:
+                        uttt.board[uttt.curBestMove.coord[0]][uttt.curBestMove.coord[1]]="_"
+                    uttt.curBestMove=child
+                    uttt.board[uttt.curBestMove.coord[0]][uttt.curBestMove.coord[1]]="O"
+                    # for triplet in uttt.board:
+                    #     print(triplet)
+                    minVal=eval
+                    # print("min: "+str(minVal))
+                else:
+                    uttt.board[child.coord[0]][child.coord[1]]="_"
+            bestValue=minVal
+        if depth==0:
+            uttt.curBestMove1=uttt.curBestMove
+        if depth==1:
+            uttt.curBestMove2=uttt.curBestMove
+        if depth==2:
+            uttt.curBestMove3=uttt.curBestMove
+        # print("best: "+str(bestValue))
+        # print()
+>>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
         return bestValue
 
     def playGamePredifinedAgent(self,maxFirst,isMinimaxOffensive,isMinimaxDefensive):
@@ -425,6 +485,7 @@ class ultimateTicTacToe:
         root.coord=(1,1)
         root.locIdx=4
         bestValue = uttt.minimax(0, root.locIdx, isMax, root)
+<<<<<<< HEAD
         print(uttt.curBestMove.coord)
         if isMax:
             uttt.board[uttt.curBestMove.coord[0]][uttt.curBestMove.coord[1]]='X'
@@ -440,6 +501,44 @@ class ultimateTicTacToe:
             #print(uttt.curBestMove.coord)
             #print(bestValue)
             print()
+=======
+        # if isMax:
+        #     uttt.board[uttt.curBestMove1.coord[0]][uttt.curBestMove1.coord[1]]='X'
+        #     # uttt.board[uttt.curBestMove2.coord[0]][uttt.curBestMove2.coord[1]]='O'
+        #     # uttt.board[uttt.curBestMove3.coord[0]][uttt.curBestMove3.coord[1]]='X'
+        # else:
+        #     uttt.board[uttt.curBestMove1.coord[0]][uttt.curBestMove1.coord[1]]='O'
+        #     # uttt.board[uttt.curBestMove2.coord[0]][uttt.curBestMove2.coord[1]]='X'
+        #     # uttt.board[uttt.curBestMove3.coord[0]][uttt.curBestMove3.coord[1]]='O'
+        for triplet in uttt.board:
+            print(triplet)
+        while uttt.checkWinner()==0:
+            temp=uttt.curBestMove3
+            uttt.curBestMove1=Tree()
+            uttt.curBestMove2=Tree()
+            uttt.curBestMove3=Tree()
+            bestValue = uttt.minimax(0, temp.locIdx, isMax, temp)
+            # if isMax:
+            #     uttt.board[uttt.curBestMove1.coord[0]][uttt.curBestMove1.coord[1]]='X'
+            #     # uttt.board[uttt.curBestMove2.coord[0]][uttt.curBestMove2.coord[1]]='O'
+            #     # uttt.board[uttt.curBestMove3.coord[0]][uttt.curBestMove3.coord[1]]='X'
+            # else:
+            #     uttt.board[uttt.curBestMove1.coord[0]][uttt.curBestMove1.coord[1]]='O'
+            #     # uttt.board[uttt.curBestMove2.coord[0]][uttt.curBestMove2.coord[1]]='X'
+            #     # uttt.board[uttt.curBestMove3.coord[0]][uttt.curBestMove3.coord[1]]='O'
+            # if isMax:
+            #     uttt.board[uttt.curBestMove.coord[0]][uttt.curBestMove.coord[1]]='X'
+            # else:
+            #     uttt.board[uttt.curBestMove.coord[0]][uttt.curBestMove.coord[1]]='O'
+            for triplet in uttt.board:
+                print(triplet)
+            print()
+            print(uttt.curBestMove.coord)
+            #print(bestValue)
+            # print()
+        if(uttt.checkWinner()):
+             print("checkWinner is 1")
+>>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
         winner=0
         return uttt.curBestMove.coord, bestValue
         #return gameBoards, bestMove, expandedNodes, bestValue, winner
