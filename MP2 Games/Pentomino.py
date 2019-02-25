@@ -101,8 +101,8 @@ if __name__ == "__main__":
     well on the pentomino set you should be fine. The TA solution is able to run
     in <15 sec for the pentominos on the 6x10 board.
     """
-    board = instances.board_6x10
-    pents = instances.dominos
+    board = instances.board_3x20
+    pents = instances.petnominos
     sol_list = solve(board, pents)
     if check_correctness(sol_list, board, pents):
         print("PASSED!")

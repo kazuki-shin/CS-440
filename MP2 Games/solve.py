@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-import random
+import queue as Q
+from collections import defaultdict
 
 def get_pent_idx(pent):
     """
@@ -16,9 +17,10 @@ def get_pent_idx(pent):
             break
     if pidx == 0:
         return -1
-    return pidx
+    return pidx - 1
 
-def add_pentomino(board, pent, coord, check_pent=False, valid_pents=None):
+def add_pentomino(board, pent, coord, constraints, choices, orientation, check_pent=False, valid_pents=None):
+    pidx = get_pent_idx(pent)
     if (pent.shape[0] + coord[0]) > board.shape[0] or (pent.shape[1] + coord[1]) > board.shape[1]:
         return False
     for row in range(pent.shape[0]):
@@ -29,30 +31,13 @@ def add_pentomino(board, pent, coord, check_pent=False, valid_pents=None):
     for row in range(pent.shape[0]):
         for col in range(pent.shape[1]):
             if pent[row][col] != 0:
-                board[coord[0]+row][coord[1]+col] = 0
+                constraints[(row + coord[0], col + coord[1])].add((pidx, orientation, coord))
+                choices[(pidx, orientation, coord)].add((row + coord[0], col + coord[1]))
+    constraints[pidx].add((pidx, orientation, coord))
+    choices[(pidx, orientation, coord)].add(pidx)
     return True
 
-def remove_pentomino(board, pent, coord):
-    for row in range(pent.shape[0]):
-        for col in range(pent.shape[1]):
-            if pent[row][col] != 0:
-                board[coord[0]+row][coord[1]+col] = 1
-
-def restore_board(solution, board):
-    for i in solution:
-        for row in range(i[0].shape[0]):
-            for col in range(i[0].shape[1]):
-                if i[0][row][col] != 0:
-                    board[i[1][0]+row][i[1][1]+col] = 1
-
-<<<<<<< HEAD
-def factorial(fact):
-    if fact == 1:
-        return 1
-    return fact * factorial(fact - 1)
-=======
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
-def solve(board, pents, app=None):
+def solve(board, pents):
     """
     This is the function you will implement. It will take in a numpy array of the board
     as well as a list of n tiles in the form of numpy arrays. The solution returned
@@ -67,173 +52,80 @@ def solve(board, pents, app=None):
     """
     if len(pents) == 0:
         return []
-    if 1 not in board:
-        return []
     solution = []
-    done = solve_helper(board, pents, solution, len(pents), pents)
-<<<<<<< HEAD
-    i = 0
-    print(len(pents))
-    print(factorial(len(pents)))
-    while not done and i < factorial(len(pents)):
-        random.shuffle(pents)
-        done = solve_helper(board, pents, solution, len(pents), pents)
-        i += 1
-=======
-    while not done:
-        a = pents[0]
-        pents[0] = pents[-1]
-        pents[-1] = a
-        done = solve_helper(board, pents, solution, len(pents), pents)
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
-    if app is not None:
-        app.draw_solution_and_sleep(solution, 1)
-    restore_board(solution, board)
+    constraints = defaultdict(set)
+    choices = defaultdict(set)
+    for x in range(board.shape[0]):
+        for y in range(board.shape[1]):
+            coord = (x, y)
+            for i in pents:
+                add_pentomino(board, i, coord, constraints, choices, 0)
+                add_pentomino(board, np.rot90(i), coord, constraints, choices, 1)
+                add_pentomino(board, np.rot90(np.rot90(i)), coord, constraints, choices, 2)
+                add_pentomino(board, np.rot90(np.rot90(np.rot90(i))), coord, constraints, choices, 3)
+                add_pentomino(board, np.fliplr(i), coord, constraints, choices, 4)
+                add_pentomino(board, np.rot90(np.fliplr(i)), coord, constraints, choices, 5)
+                add_pentomino(board, np.rot90(np.rot90(np.fliplr(i))), coord, constraints, choices, 6)
+                add_pentomino(board, np.rot90(np.rot90(np.rot90(np.fliplr(i)))), coord, constraints, choices, 7)
+    done = solve_helper(board, pents, solution, constraints, choices)
     return solution
 
 
-def solve_helper(board, pents, solution, num_pents, all_pents):
-<<<<<<< HEAD
-=======
-    added = False
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
-    if num_pents == len(solution):
+def solve_helper(board, pents, solution, constraints, choices):
+    if not constraints.keys() or len(solution) == len(pents):
         return True
+    done = False
+    min_val = float("inf")
     coord = ()
-    brk = False
+
     for x in range(board.shape[0]):
         for y in range(board.shape[1]):
-            if board[x][y] != 0:
+            if (x, y) in constraints.keys() and len(constraints[(x, y)]) <= min_val:
+                min_val = len(constraints[(x, y)])
+                if min_val == 0:
+                    return False
                 coord = (x, y)
-                brk = True
-                break
-        if brk:
-            break
-    if not coord:
-        return False
-<<<<<<< HEAD
-    counter = 0
-=======
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
-    i = pents[0]
-    if add_pentomino(board, i, coord):
-        sol = (i, coord)
-        solution.append(sol)
-        done = solve_helper(board, pents[1:], solution, num_pents, all_pents)
-<<<<<<< HEAD
-=======
-        added = True
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
-        if done or num_pents == len(solution):
+
+    for choice in constraints[coord]:
+        pidx = choice[0]
+        pent = pents[pidx]
+        if choice[1] == 1:
+            pent = np.rot90(pent)
+        if choice[1] == 2:
+            pent = np.rot90(np.rot90(pent))
+        if choice[1] == 3:
+            pent = np.rot90(np.rot90(np.rot90(pent)))
+        if choice[1] == 4:
+            pent = np.fliplr(pent)
+        if choice[1] == 5:
+            pent = np.rot90(np.fliplr(pent))
+        if choice[1] == 6:
+            pent = np.rot90(np.rot90(np.fliplr(pent)))
+        if choice[1] == 7:
+            pent = np.rot90(np.rot90(np.rot90(np.fliplr(pent))))
+        solution.append((pent, choice[2]))
+        constraint_vals = {}
+        for i in choices[choice]:
+            constraint_vals[i] = constraints[i].copy()
+            del constraints[i]
+        choices_val = {}
+        for k in constraint_vals.keys():
+            for choice in constraint_vals[k]:
+                if choice in choices.keys():
+                    choices_val[choice] = choices[choice].copy()
+                    del choices[choice]
+        for k in choices_val.keys():
+            for i in choices_val[k]:
+                if i not in constraint_vals.keys():
+                    constraint_vals[i] = constraints[i].copy()
+                if i in constraints.keys() and k in constraints[i]:
+                    constraints[i].remove(k)
+        done = solve_helper(board, pents, solution, constraints, choices)
+        if done or not constraints.keys() or len(solution) == len(pents):
             return True
+        for i in constraint_vals.keys():
+            constraints[i] = constraint_vals[i].copy()
+        for k in choices_val.keys():
+            choices[k] = choices_val[k].copy()
         solution.pop(-1)
-        remove_pentomino(board, sol[0], sol[1])
-    if add_pentomino(board, np.rot90(i), coord):
-        sol = (np.rot90(i), coord)
-        solution.append(sol)
-        done = solve_helper(board, pents[1:], solution, num_pents, all_pents)
-<<<<<<< HEAD
-=======
-        added = True
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
-        if done or num_pents == len(solution):
-            return True
-        solution.pop(-1)
-        remove_pentomino(board, sol[0], sol[1])
-    if add_pentomino(board, np.rot90(np.rot90(i)), coord):
-        sol = (np.rot90(np.rot90(i)), coord)
-        solution.append(sol)
-        done = solve_helper(board, pents[1:], solution, num_pents, all_pents)
-<<<<<<< HEAD
-=======
-        added = True
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
-        if done or num_pents == len(solution):
-            return True
-        solution.pop(-1)
-        remove_pentomino(board, sol[0], sol[1])
-    if add_pentomino(board, np.rot90(np.rot90(np.rot90(i))), coord):
-        sol = (np.rot90(np.rot90(np.rot90(i))), coord)
-        solution.append(sol)
-        done = solve_helper(board, pents[1:], solution, num_pents, all_pents)
-<<<<<<< HEAD
-=======
-        added = True
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
-        if done or num_pents == len(solution):
-            return True
-        solution.pop(-1)
-        remove_pentomino(board, sol[0], sol[1])
-<<<<<<< HEAD
-    if add_pentomino(board, np.fliplr(i), coord):
-        sol = (np.fliplr(i), coord)
-        solution.append(sol)
-        done = solve_helper(board, pents[1:], solution, num_pents, all_pents)
-=======
-    if add_pentomino(board, np.flip(i, 0), coord):
-        sol = (np.flip(i, 0), coord)
-        solution.append(sol)
-        done = solve_helper(board, pents[1:], solution, num_pents, all_pents)
-        added = True
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
-        if done or num_pents == len(solution):
-            return True
-        solution.pop(-1)
-        remove_pentomino(board, sol[0], sol[1])
-<<<<<<< HEAD
-    if add_pentomino(board, np.rot90(np.fliplr(i)), coord):
-        sol = (np.rot90(np.fliplr(i)), coord)
-        solution.append(sol)
-        done = solve_helper(board, pents[1:], solution, num_pents, all_pents)
-=======
-    if add_pentomino(board, np.rot90(np.flip(i, 0)), coord):
-        sol = (np.rot90(np.flip(i, 0)), coord)
-        solution.append(sol)
-        done = solve_helper(board, pents[1:], solution, num_pents, all_pents)
-        added = True
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
-        if done or num_pents == len(solution):
-            return True
-        solution.pop(-1)
-        remove_pentomino(board, sol[0], sol[1])
-<<<<<<< HEAD
-    if add_pentomino(board, np.rot90(np.rot90(np.fliplr(i))), coord):
-        sol = (np.rot90(np.rot90(np.fliplr(i))), coord)
-        solution.append(sol)
-        done = solve_helper(board, pents[1:], solution, num_pents, all_pents)
-=======
-    if add_pentomino(board, np.rot90(np.rot90(np.flip(i, 0))), coord):
-        sol = (np.rot90(np.rot90(np.flip(i, 0))), coord)
-        solution.append(sol)
-        done = solve_helper(board, pents[1:], solution, num_pents, all_pents)
-        added = True
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
-        if done or num_pents == len(solution):
-            return True
-        solution.pop(-1)
-        remove_pentomino(board, sol[0], sol[1])
-<<<<<<< HEAD
-    if add_pentomino(board, np.rot90(np.rot90(np.rot90(np.fliplr(i)))), coord):
-        sol = (np.rot90(np.rot90(np.rot90(np.fliplr(i)))), coord)
-        solution.append(sol)
-        done = solve_helper(board, pents[1:], solution, num_pents, all_pents)
-=======
-    if add_pentomino(board, np.rot90(np.rot90(np.rot90(np.flip(i, 0)))), coord):
-        sol = (np.rot90(np.rot90(np.rot90(np.flip(i, 0)))), coord)
-        solution.append(sol)
-        done = solve_helper(board, pents[1:], solution, num_pents, all_pents)
-        added = True
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
-        if done or num_pents == len(solution):
-            return True
-        solution.pop(-1)
-        remove_pentomino(board, sol[0], sol[1])
-<<<<<<< HEAD
-=======
-    if i.any() != all_pents[-1].any() and not added:
-        a = pents[0]
-        pents[0] = pents[-1]
-        pents[-1] = a
-        return solve_helper(board, pents, solution, num_pents, all_pents)
->>>>>>> 8a3df55d1982e8e2ed4aefc1bc8a3c06ed8e10b3
     return False
