@@ -1,4 +1,5 @@
 import numpy as np
+from time import time
 
 class NaiveBayes(object):
 	def __init__(self,num_class,feature_dim,num_value):
@@ -24,6 +25,8 @@ class NaiveBayes(object):
 		self.prior = np.zeros((num_class))
 		self.likelihood = np.zeros((feature_dim,num_value,num_class))
 
+		self.timer = time()
+
 	def train(self,train_set,train_label):
 		""" Train naive bayes model (self.prior and self.likelihood) with training dataset.
 			self.prior(numpy.ndarray): training set class prior (in log) with a dimension of (# of class,),
@@ -37,7 +40,7 @@ class NaiveBayes(object):
 		"""
 
 		# YOUR CODE HERE
-
+		train_time =  time()
 		print("<<< training model... >>>")
 		print("")
 		#reading in 50000 images, mapping occurence of each value to corresponding pixel
@@ -84,6 +87,7 @@ class NaiveBayes(object):
 
 		print("")
 		print("<<< TRAINING COMPLETED >>>")
+		print("Training took: "+int(time() - train_time)+" seconds")
 
 		self.save_model("prior", "likelihood")
 		print("")
@@ -107,6 +111,7 @@ class NaiveBayes(object):
 		"""
 
 		# YOUR CODE HERE
+		test_time = time()
 		print("<<< LOADING MODELS >>>")
 		print("")
 		self.load_model("prior.npy", "likelihood.npy")
@@ -135,6 +140,9 @@ class NaiveBayes(object):
 		print("")
 		print(pred_label)
 		print("")
+		print("Testing took: "+int(time() - test_time)+" seconds")
+		print("")
+		print("Naive Bayes train/test took: "+int(time() - test_time)+" seconds")
 
 		# classification_rate = np.zeros
 		return accuracy, pred_label
