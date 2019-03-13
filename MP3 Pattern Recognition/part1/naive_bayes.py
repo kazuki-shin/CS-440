@@ -42,37 +42,24 @@ class NaiveBayes(object):
 		print("")
 		#reading in 50000 images, mapping occurence of each value to corresponding pixel
 		# class_dict {class -> pixel number -> pixel value}
-		class_dict={};
+		laplace = 1
+		class_dict = np.zeros(10*784*256).reshape(10,784,256)
 		for curr_image in range(len(train_set)):
 			image_type = train_label[curr_image]
 			for pixel_idx in range(len(train_set[curr_image])):
 				pixel_color = train_set[curr_image][pixel_idx]
-				if image_type in class_dict:
-					if pixel_idx in class_dict[image_type]:
-						if pixel_color in class_dict[image_type][pixel_idx]:
-							class_dict[image_type][pixel_idx][pixel_color] += 1
-						else:
-							class_dict[image_type][pixel_idx][pixel_color] = 1
-					else:
-						 class_dict[image_type][pixel_idx] = {pixel_color: 1}
-				else:
-					class_dict[image_type] = {pixel_idx:{pixel_color: 1}}
+				class_dict[image_type][pixel_idx][pixel_color] += 1
 
 		print("<<< calculating likelihood... >>>")
 		print("")
-
-		laplace = 1
 
 		# calculates probability for each value with laplace smoothing
 		for x in range(784):
 			for y in range(255):
 				for z in range(10):
 					#print("On pixel: " +str(x) + " value: "+str(y)+" class: "+str(z))
-					if class_dict[z][x].get(y) is not None:
-						prob = (class_dict[z][x][y]+laplace)/(50000+laplace)     # laplace smoothing
-						self.likelihood[x][y][z] = prob
-					else:
-						self.likelihood[x][y][z] = laplace/(50000+laplace)
+					prob = (class_dict[z][x][y]+laplace)/(50000+laplace)     # laplace smoothing
+					self.likelihood[x][y][z] = prob
 
 		print("<<< creating likelihood set... >>>")
 
