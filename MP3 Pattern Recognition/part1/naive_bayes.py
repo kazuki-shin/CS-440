@@ -63,8 +63,6 @@ class NaiveBayes(object):
 				for z in range(10):
 					#print("On pixel: " +str(x) + " value: "+str(y)+" class: "+str(z))
 					prob = (class_dict[z][x][y]+laplace)/((class_count[z])+laplace*256)      # laplace smoothing
-					if prob == 0:
-						print("HOLAAAAAAAAAA")
 					self.likelihood[x][y][z] = prob
 
 		print("<<< creating likelihood set... >>>")
@@ -81,6 +79,10 @@ class NaiveBayes(object):
 
 		print("")
 		print("<<< TRAINING COMPLETED >>>")
+
+		self.save_model("prior", "likelihood")
+		print("")
+		print("<<< SAVING MODELS >>>")
 
 		return
 
@@ -100,6 +102,9 @@ class NaiveBayes(object):
 		"""
 
 		# YOUR CODE HERE
+		print("<<< LOADING MODELS >>>")
+		print("")
+		self.load_model("prior.npy", "likelihood.npy")
 		print("starting test")
 		pred_label = np.zeros((len(test_set)))
 		total_correct = 0
@@ -131,21 +136,17 @@ class NaiveBayes(object):
 		print("")
 
 		# classification_rate = np.zeros
-
 		return accuracy, pred_label
-
 
 	def save_model(self, prior, likelihood):
 		""" Save the trained model parameters
 		"""
-
 		np.save(prior, self.prior)
 		np.save(likelihood, self.likelihood)
 
 	def load_model(self, prior, likelihood):
 		""" Load the trained model parameters
 		"""
-
 		self.prior = np.load(prior)
 		self.likelihood = np.load(likelihood)
 
