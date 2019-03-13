@@ -1,5 +1,5 @@
-# Main function for train, test and visualize. 
-# You do not need to modify this file. 
+# Main function for train, test and visualize.
+# You do not need to modify this file.
 
 import numpy as np
 from perceptron import MultiClassPerceptron
@@ -9,7 +9,7 @@ from sklearn.metrics import confusion_matrix
 from sklearn.utils.multiclass import unique_labels
 
 def load_dataset(data_dir=''):
-    """Load the train and test examples 
+    """Load the train and test examples
     """
     x_train = np.load("data/x_train.npy")
     y_train = np.load("data/y_train.npy")
@@ -19,8 +19,8 @@ def load_dataset(data_dir=''):
     return x_train, y_train, x_test, y_test
 
 def plot_visualization(images, classes, cmap):
-    """Plot the visualizations 
-    """    
+    """Plot the visualizations
+    """
     fig, ax = plt.subplots(2, 5, figsize=(12, 5))
     for i in range(10):
         ax[i%2, i//2].imshow(images[:, i].reshape((28, 28)), cmap=cmap)
@@ -85,40 +85,40 @@ def plot_confusion_matrix(y_true, y_pred, classes,
 
 if __name__ == '__main__':
 
-    # Load dataset. 
+    # Load dataset.
     x_train, y_train, x_test, y_test = load_dataset()
 
 
     # Initialize naive bayes model.
     num_class = len(np.unique(y_train))
-    feature_dim = len(x_train[0]) 
+    feature_dim = len(x_train[0])
     num_value = 256
     NB = NaiveBayes(num_class,feature_dim,num_value)
     # Train model.
     NB.train(x_train,y_train)
-    # Feature likelihood for high intensity pixels. 
+    # Feature likelihood for high intensity pixels.
     feature_likelihoods = NB.intensity_feature_likelihoods(NB.likelihood)
-    # Visualize the feature likelihoods for high intensity pixels. 
+    # Visualize the feature likelihoods for high intensity pixels.
     class_names = np.array(["T-shirt/top","Trouser","Pullover","Dress",
         "Coat","Sandal","Shirt","Sneaker","Bag","Ankle boot"])
     plot_visualization(feature_likelihoods, class_names, "Greys")
-    # Classify the test sets. 
+    # Classify the test sets.
     accuracy, y_pred = NB.test(x_test,y_test)
-    # Plot confusion matrix. 
+    # Plot confusion matrix.
     plot_confusion_matrix(y_test, y_pred, classes=class_names, normalize=True,
                       title='Confusion matrix, with normalization')
     plt.show()
 
-    
-    # Initialize perceptron model. 
-    perceptron = MultiClassPerceptron(num_class,feature_dim)
-    # Train model.
-    perceptron.train(x_train,y_train)
-    # Visualize the learned perceptron weights. 
-    plot_visualization(perceptron.w[:-1,:], class_names, None)
-    # Classify the test sets. 
-    accuracy, y_pred = perceptron.test(x_test,y_test)
-    # Plot confusion matrix.
-    plot_confusion_matrix(y_test, y_pred, classes=class_names, normalize=True,
-                      title='Confusion matrix, with normalization')
-    plt.show()    
+
+    # # Initialize perceptron model.
+    # perceptron = MultiClassPerceptron(num_class,feature_dim)
+    # # Train model.
+    # perceptron.train(x_train,y_train)
+    # # Visualize the learned perceptron weights.
+    # plot_visualization(perceptron.w[:-1,:], class_names, None)
+    # # Classify the test sets.
+    # accuracy, y_pred = perceptron.test(x_test,y_test)
+    # # Plot confusion matrix.
+    # plot_confusion_matrix(y_test, y_pred, classes=class_names, normalize=True,
+    #                   title='Confusion matrix, with normalization')
+    # plt.show()
