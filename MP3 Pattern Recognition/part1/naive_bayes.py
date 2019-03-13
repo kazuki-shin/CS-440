@@ -63,6 +63,8 @@ class NaiveBayes(object):
 				for z in range(10):
 					#print("On pixel: " +str(x) + " value: "+str(y)+" class: "+str(z))
 					prob = (class_dict[z][x][y]+laplace)/((class_count[z])+laplace*256)      # laplace smoothing
+					if prob != 0:
+						prob = np.log(prob)
 					self.likelihood[x][y][z] = prob
 
 		print("<<< creating likelihood set... >>>")
@@ -72,7 +74,10 @@ class NaiveBayes(object):
 		print("")
 
 		for class_num in range(10):
-			self.prior[class_num] = (class_count[class_num]+laplace)/(50000+laplace*10)
+			prior_prob =  (class_count[class_num]+laplace)/(50000+laplace*10)
+			if prior_prob != 0:
+				prior_prob = np.log(prior_prob)
+			self.prior[class_num] = prior_prob
 
 		print("<<< creating prior probability set... >>>")
 		print(self.prior)
@@ -114,14 +119,10 @@ class NaiveBayes(object):
 			actual_label = test_label[curr_image]
 			class_occurence = np.zeros(10)
 			for curr_class in range(10):
-				curr_prob = np.log(self.prior[curr_class])
+				curr_prob = self.prior[curr_class]
 				for pixel_idx in range(len(test_set[curr_image])):
 					pixel_color = test_set[curr_image][pixel_idx]
-					initial_prob = self.likelihood[pixel_idx][pixel_color][curr_class]
-					if initial_prob != 0:
-						curr_prob += np.log(initial_prob)
-					else:
-						null_cnt+=1
+					curr_prob += self.likelihood[pixel_idx,pixel_color,curr_class]
 				class_occurence[curr_class] = curr_prob
 			pred_label[curr_image] = np.argmax(class_occurence)
 			if int(pred_label[curr_image]) == actual_label:
@@ -151,6 +152,9 @@ class NaiveBayes(object):
 		self.likelihood = np.load(likelihood)
 
 	def intensity_feature_likelihoods(self, likelihood):
+		print("<<< LOADING MODELS >>>")
+		print("")
+		self.load_model("prior.npy", "likelihood.npy")
 		feature_likelihoods = np.zeros((likelihood.shape[0],likelihood.shape[2]))
 		for image_type in range(10):
 			for color in range(128):

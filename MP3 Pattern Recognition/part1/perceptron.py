@@ -26,12 +26,12 @@ class MultiClassPerceptron(object):
 		    train_set(numpy.ndarray): training examples with a dimension of (# of examples, feature_dim)
 		    train_label(numpy.ndarray): training labels with a dimension of (# of examples, )
 		"""
+		# dot product weights with training set
 
-		# YOUR CODE HERE
 		# should be abt 0.01
 		learning_rate = 0.01
 		print(len(train_set))
-		for _ in range(100):
+		for _ in range(len(train_set)):
 			print(_)
 			sum_error = 0.0
 			for idx in range(len(train_set)):
