@@ -42,7 +42,7 @@ class NaiveBayes(object):
 		print("")
 		#reading in 50000 images, mapping occurence of each value to corresponding pixel
 		# class_dict {class -> pixel number -> pixel value}
-		laplace = 10
+		laplace = 0.1
 		class_count=np.zeros(10)
 		for example in range(len(train_set)):
 		  class_count[train_label[example]]+=1
@@ -63,6 +63,8 @@ class NaiveBayes(object):
 				for z in range(10):
 					#print("On pixel: " +str(x) + " value: "+str(y)+" class: "+str(z))
 					prob = (class_dict[z][x][y]+laplace)/((class_count[z])+laplace*256)      # laplace smoothing
+					if prob == 0:
+						print("HOLAAAAAAAAAA")
 					self.likelihood[x][y][z] = prob
 
 		print("<<< creating likelihood set... >>>")
@@ -101,6 +103,7 @@ class NaiveBayes(object):
 		print("starting test")
 		pred_label = np.zeros((len(test_set)))
 		total_correct = 0
+		null_cnt = 0
 
 		for curr_image in range(len(test_set)):
 			actual_label = test_label[curr_image]
@@ -112,16 +115,22 @@ class NaiveBayes(object):
 					initial_prob = self.likelihood[pixel_idx][pixel_color][curr_class]
 					if initial_prob != 0:
 						curr_prob += np.log(initial_prob)
+					else:
+						null_cnt+=1
 				class_occurence[curr_class] = curr_prob
 			pred_label[curr_image] = np.argmax(class_occurence)
 			if int(pred_label[curr_image]) == actual_label:
 				total_correct += 1
 
 		accuracy = total_correct / len(test_set)
-		print("Current Test Accuracy at: "+str(accuracy*100)+"%")
+		print("Current Test Accuracy at: "+str(accuracy*100)+"% with null cnt: "+str(null_cnt))
 		print("")
 		print(str(total_correct)+" out of 10,000 images correct")
 		print("")
+		print(pred_label)
+		print("")
+
+		# classification_rate = np.zeros
 
 		return accuracy, pred_label
 

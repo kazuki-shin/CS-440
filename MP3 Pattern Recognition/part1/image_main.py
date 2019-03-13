@@ -87,11 +87,11 @@ if __name__ == '__main__':
 
     # Load dataset.
     x_train, y_train, x_test, y_test = load_dataset()
-
-
     # Initialize naive bayes model.
     num_class = len(np.unique(y_train))
     feature_dim = len(x_train[0])
+
+    ################ Bayes Test #####################
     num_value = 256
     NB = NaiveBayes(num_class,feature_dim,num_value)
     # Train model.
@@ -109,7 +109,7 @@ if __name__ == '__main__':
                       title='Confusion matrix, with normalization')
     plt.show()
 
-
+    ################ Perceptron Test #####################
     # # Initialize perceptron model.
     # perceptron = MultiClassPerceptron(num_class,feature_dim)
     # # Train model.
