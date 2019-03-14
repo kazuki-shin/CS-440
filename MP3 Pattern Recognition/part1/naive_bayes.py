@@ -60,15 +60,19 @@ class NaiveBayes(object):
 		print("<<< calculating likelihood... >>>")
 		print("")
 
+		log_dict = {}
+
 		# calculates probability for each value with laplace smoothing
 		for x in range(784):
 			for y in range(255):
 				for z in range(10):
-					#print("On pixel: " +str(x) + " value: "+str(y)+" class: "+str(z))
-					prob = (class_dict[z][x][y]+laplace)/((class_count[z])+laplace*256)      # laplace smoothing
-					if prob != 0:
-						prob = np.log(prob)
-					self.likelihood[x][y][z] = prob
+					prob = ((class_dict[z][x][y]+laplace)/((class_count[z])+laplace*256))
+					if prob in log_dict:
+						self.likelihood[x][y][z] = log_dict[prob]
+					else:
+						log_val = np.log(prob)
+						self.likelihood[x][y][z] = log_val
+						log_dict[prob] =  log_val
 
 		print("<<< creating likelihood set... >>>")
 
@@ -87,7 +91,7 @@ class NaiveBayes(object):
 
 		print("")
 		print("<<< TRAINING COMPLETED >>>")
-		print("Training took: "+int(time() - train_time)+" seconds")
+		print("Training took: "+str(int(time() - train_time))+" seconds")
 
 		self.save_model("prior", "likelihood")
 		print("")
@@ -122,14 +126,15 @@ class NaiveBayes(object):
 
 		for curr_image in range(len(test_set)):
 			actual_label = test_label[curr_image]
-			class_occurence = np.zeros(10)
+			max_prob = -float("inf")
 			for curr_class in range(10):
 				curr_prob = self.prior[curr_class]
 				for pixel_idx in range(len(test_set[curr_image])):
 					pixel_color = test_set[curr_image][pixel_idx]
 					curr_prob += self.likelihood[pixel_idx,pixel_color,curr_class]
-				class_occurence[curr_class] = curr_prob
-			pred_label[curr_image] = np.argmax(class_occurence)
+				if curr_prob > max_prob:
+					max_prob = curr_prob
+					pred_label[curr_image] = curr_class
 			if int(pred_label[curr_image]) == actual_label:
 				total_correct += 1
 
@@ -140,9 +145,9 @@ class NaiveBayes(object):
 		print("")
 		print(pred_label)
 		print("")
-		print("Testing took: "+int(time() - test_time)+" seconds")
+		print("Testing took: "+str(int(time() - test_time))+" seconds")
 		print("")
-		print("Naive Bayes train/test took: "+int(time() - test_time)+" seconds")
+		print("Naive Bayes train/test took: "+str(int(time() - self.timer))+" seconds")
 
 		# classification_rate = np.zeros
 		return accuracy, pred_label
