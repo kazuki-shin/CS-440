@@ -6,7 +6,7 @@
 # attribution to the University of Illinois at Urbana-Champaign
 #
 # Created by Dhruv Agarwal (dhruva2@illinois.edu) on 02/21/2019
-
+import math
 """
 You should only modify code within this file -- the unrevised staff files will be used for all other
 files and classes when code is run, so be careful to not modify anything else.
@@ -20,6 +20,10 @@ class TextClassifier(object):
         """
         self.lambda_mixture = 0.0
 
+        self.prior = []
+        self.likelihood = []
+        self.num_words = []
+
     def fit(self, train_set, train_label):
         """
         :param train_set - List of list of words corresponding with each text
@@ -30,9 +34,48 @@ class TextClassifier(object):
             example: Suppose I had two texts, first one was class 0 and second one was class 1.
             Then train_labels := [0,1]
         """
-
         # TODO: Write your code here
-        pass
+        laplace=0.1
+        class_count = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        prior_prob = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+        for example in range(len(train_set)):
+            class_count[train_label[example] - 1] += 1
+        for i in range(14):
+            prob = class_count[i]
+            prob += laplace
+            prob /= (len(train_label) + laplace*14)
+            log_prob = math.log10(prob)
+            prior_prob[i] = log_prob
+        text_dict = []
+        log_dict = []
+        for i in range(14):
+            text_dict.append({})
+            log_dict.append({})
+        for i in range(len(train_set)):
+            for word in train_set[i]:
+                for k in range(14):
+                    text_dict[k][word]=0
+
+        for i in range(len(train_set)):
+            type = train_label[i] - 1
+            for word in train_set[i]:
+                text_dict[type][word] += 1
+
+        num_words = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        for i in range(14):
+            for word in text_dict[i].keys():
+                num_words[i] += text_dict[i][word]
+
+        for i in range(14):
+            for word in text_dict[i].keys():
+                prob = (text_dict[i][word]+laplace)/(num_words[i] + laplace*len(text_dict[i].keys()))
+                log_dict[i][word] = math.log10(prob)
+
+        self.prior = prior_prob.copy()
+        self.likelihood = log_dict.copy()
+        self.num_words = num_words.copy()
+
+        return
 
     def predict(self, x_set, dev_label,lambda_mix=0.0):
         """
@@ -45,12 +88,31 @@ class TextClassifier(object):
                 accuracy(float): average accuracy value for dev dataset
                 result (list) : predicted class for each text
         """
-
+        likelihood = self.likelihood
+        prior = self.prior
+        num_words = self.num_words
         accuracy = 0.0
         result = []
+        index = 0
+        for doc in x_set:
+            class_prob = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+            for type in range(14):
+                class_prob[type] += prior[type]
+                for word in doc:
+                    if word in likelihood[type].keys():
+                        class_prob[type] += likelihood[type][word]
+                    else:
+                        class_prob[type] += math.log10(1 / (num_words[type] + len(likelihood[type].keys())))
+            max_idx = 0
+            max_prob = 0
+            for i in range(14):
+                if 10**class_prob[i] >= max_prob:
+                    max_prob = 10**class_prob[i]
+                    max_idx = i
+            result.append(max_idx + 1)
+            if result[-1] == dev_label[index]:
+                accuracy += 1
+            index += 1
 
-        # TODO: Write your code here
-        pass
-
+        accuracy /= len(x_set)
         return accuracy,result
-
