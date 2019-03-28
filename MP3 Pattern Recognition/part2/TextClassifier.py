@@ -44,8 +44,7 @@ class TextClassifier(object):
             class_count[train_label[example] - 1] += 1
         for i in range(14):
             prob = class_count[i]
-            prob += laplace
-            prob /= (len(train_label) + laplace*14)
+            prob /= (len(train_label))
             log_prob = math.log10(prob)
             prior_prob[i] = log_prob
         text_dict = []
@@ -67,9 +66,12 @@ class TextClassifier(object):
         for i in range(14):
             for word in text_dict[i].keys():
                 num_words[i] += text_dict[i][word]
+        print("20 largest words in each class")
         for i in range(14):
             k_keys_sorted = heapq.nlargest(20, text_dict[i],key=text_dict[i].get)
             print(k_keys_sorted)
+        print("")
+        print("")
 
         for i in range(14):
             for word in text_dict[i].keys():
@@ -100,6 +102,12 @@ class TextClassifier(object):
         accuracy = 0.0
         result = []
         index = 0
+        confusion_matrix=[]
+        for i in range(14):
+            confusion_matrix.append([])
+            for j in range(14):
+                confusion_matrix[i].append([])
+                confusion_matrix[i][j]=0
         for doc in x_set:
             class_prob = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
             for type in range(14):
@@ -116,9 +124,23 @@ class TextClassifier(object):
                     max_prob = 10**class_prob[i]
                     max_idx = i
             result.append(max_idx + 1)
+            confusion_matrix[result[-1]-1][dev_label[index]-1]+=1
             if result[-1] == dev_label[index]:
                 accuracy += 1
             index += 1
-
+        num_class=[]
+        for i in range(14):
+            num_class.append(0)
+        for i in range(14):
+            for j in range(14):
+                num_class[i]+=confusion_matrix[i][j]
+        print("Confusion Matrix")
+        for i in range(14):
+            for j in range(14):
+                confusion_matrix[i][j]=confusion_matrix[i][j]/num_class[i]
         accuracy /= len(x_set)
+        for i in range(14):
+            print(confusion_matrix[i])
+        print("")
+        print("")
         return accuracy,result
