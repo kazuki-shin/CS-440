@@ -7,6 +7,8 @@
 #
 # Created by Dhruv Agarwal (dhruva2@illinois.edu) on 02/21/2019
 import math
+import heapq
+
 """
 You should only modify code within this file -- the unrevised staff files will be used for all other
 files and classes when code is run, so be careful to not modify anything else.
@@ -65,11 +67,15 @@ class TextClassifier(object):
         for i in range(14):
             for word in text_dict[i].keys():
                 num_words[i] += text_dict[i][word]
+        for i in range(14):
+            k_keys_sorted = heapq.nlargest(20, text_dict[i],key=text_dict[i].get)
+            print(k_keys_sorted)
 
         for i in range(14):
             for word in text_dict[i].keys():
                 prob = (text_dict[i][word]+laplace)/(num_words[i] + laplace*len(text_dict[i].keys()))
                 log_dict[i][word] = math.log10(prob)
+        # print(text_dict[i].keys())
 
         self.prior = prior_prob.copy()
         self.likelihood = log_dict.copy()
