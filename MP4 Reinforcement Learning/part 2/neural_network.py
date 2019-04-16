@@ -2,8 +2,7 @@ import numpy as np
 import random
 
 def shuffle(x_train,y_train):
-    seed = random.randint(1,101)
-    np.random.seed(seed)
+    np.random.seed(seed=57)
     np.random.shuffle(x_train)
     np.random.shuffle(y_train)
     return x_train, y_train
@@ -37,18 +36,18 @@ def minibatch_gd(epoch, w1, w2, w3, w4, b1, b2, b3, b4, x_train, y_train, num_cl
     losses = np.zeros(epoch)
     # 2. call four_nn function to obtain losses
     for e in range(epoch):
-        print("Epoch #: "+str(e))
+        print(e)
         # shuffle data
         x_temp, y_temp = x_train, y_train
-        if shuffle:
-            x_temp, y_temp = shuffle(x_train, y_train)
+        # if shuffle:
+        #     x_temp, y_temp = shuffle(x_train, y_train)
 
         total_loss = 0
         for i in range(full_set):
             X, y = x_temp[i * batch_size: i * batch_size + batch_size], y_temp[i * batch_size: i * batch_size + batch_size]
             loss, w1, w2, w3, w4 = four_nn(X, w1, w2, w3, w4, b1, b2, b3, b4, y, False)
             total_loss += loss
-        losses[e] = loss
+        losses[e] = total_loss
     # 3. Return all the weights/biases and a list of losses at each epoch
     return w1, w2, w3, w4, b1, b2, b3, b4, losses
 
@@ -70,7 +69,7 @@ def minibatch_gd(epoch, w1, w2, w3, w4, b1, b2, b3, b4, x_train, y_train, num_cl
 """
 def test_nn(w1, w2, w3, w4, b1, b2, b3, b4, x_test, y_test, num_classes):
 
-    num_examples = len(x_train)
+    num_examples = len(x_test)
     batch_size = 200
     full_set = (int) (num_examples / batch_size)
     corrects = 0
@@ -78,11 +77,11 @@ def test_nn(w1, w2, w3, w4, b1, b2, b3, b4, x_test, y_test, num_classes):
     avg_class_rate = 0
 
     for i in range(len(x_test)):
-        for i in range(full_set):
-            X, y = x_temp[i * batch_size: i * batch_size + batch_size], y_temp[i * batch_size: i * batch_size + batch_size]
-            res_max = four_nn(X, w1, w2, w3, w4, b1, b2, b3, b4, y, True)
-            if res_max == y_test[i]:
-                avg_class_rate += 1
+        if i%100==0:
+            print("test #"+str(i)+" correct: "+str(avg_class_rate))
+        res_max = four_nn(x_test, w1, w2, w3, w4, b1, b2, b3, b4, y_test, True)
+        if res_max[i] == y_test[i]:
+            avg_class_rate += 1
 
     avg_class_rate /= num_classes
     return avg_class_rate, class_rate_per_class
@@ -160,26 +159,20 @@ def relu_backward(dA, cache):
     dZ[Z <= 0] = 0
     return dZ
 
-
 def cross_entropy(F, y):
     loss = 0
-    fy_total = 0
-    f_total = 0
+    fy_total_i = 0
     dF = F.copy()
     for i in range(F.shape[0]):
-        y_i = y[i]
-        fy_total += F[i, y_i]
+        loss += F[i, int(y[i])]
+        f_total = 0
         for k in range(F.shape[1]):
             f_total += np.exp(F[i, k])
-        fy_total -= np.log(f_total)
-    loss = -1 * fy_total / F.shape[0]
+            sum_exp = sum(np.exp(F[i, :]))
+            binary = k == y[i]
+            dF[i, k] = binary - np.exp(F[i, k]) / sum_exp
+            dF[i, k] /= (-1 * F.shape[0])
+        loss -= np.log(f_total)
+    loss /= -F.shape[0]
 
-    for i in range(F.shape[0]):
-        for j in range(F.shape[1]):
-            sum_exp = 0
-            for k in range(F.shape[1]):
-                sum_exp += np.exp(F[i, k])
-            binary = j == y[i]
-            dF[i, j] = binary - np.exp(F[i, j]) / sum_exp
-            dF[i, j] /= (-1 * F.shape[0])
     return loss, dF
