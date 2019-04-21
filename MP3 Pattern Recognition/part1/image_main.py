@@ -5,8 +5,8 @@ import numpy as np
 from perceptron import MultiClassPerceptron
 from naive_bayes import NaiveBayes
 import matplotlib.pyplot as plt
-# from sklearn.metrics import confusion_matrix
-# from sklearn.utils.multiclass import unique_labels
+from sklearn.metrics import confusion_matrix
+from sklearn.utils.multiclass import unique_labels
 
 def load_dataset(data_dir=''):
     """Load the train and test examples
