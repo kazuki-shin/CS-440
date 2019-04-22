@@ -1,11 +1,61 @@
 import numpy as np
 import random
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+from sklearn.utils.multiclass import unique_labels
 
-def shuffle(x_train,y_train):
-    np.random.seed(seed=57)
-    np.random.shuffle(x_train)
-    np.random.shuffle(y_train)
-    return x_train, y_train
+def plot_confusion_matrix(y_true, y_pred, classes,
+                          normalize=False,
+                          title=None,
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    if not title:
+        if normalize:
+            title = 'Normalized confusion matrix'
+        else:
+            title = 'Confusion matrix, without normalization'
+
+    # Compute confusion matrix
+    cm = confusion_matrix(y_true, y_pred)
+    # Only use the labels that appear in the data
+    classes = classes[unique_labels(y_true, y_pred)]
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    fig, ax = plt.subplots()
+    im = ax.imshow(cm, interpolation='nearest', cmap=cmap)
+    ax.figure.colorbar(im, ax=ax)
+    # We want to show all ticks...
+    ax.set(xticks=np.arange(cm.shape[1]),
+           yticks=np.arange(cm.shape[0]),
+           # ... and label them with the respective list entries
+           xticklabels=classes, yticklabels=classes,
+           title=title,
+           ylabel='True label',
+           xlabel='Predicted label')
+
+    # Rotate the tick labels and set their alignment.
+    plt.setp(ax.get_xticklabels(), rotation=45, ha="right",
+             rotation_mode="anchor")
+
+    # Loop over data dimensions and create text annotations.
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i in range(cm.shape[0]):
+        for j in range(cm.shape[1]):
+            ax.text(j, i, format(cm[i, j], fmt),
+                    ha="center", va="center",
+                    color="white" if cm[i, j] > thresh else "black")
+    fig.tight_layout()
+    return ax
 
 """
     Minigratch Gradient Descent Function to train model
@@ -37,14 +87,14 @@ def minibatch_gd(epoch, w1, w2, w3, w4, b1, b2, b3, b4, x_train, y_train, num_cl
     # 2. call four_nn function to obtain losses
     for e in range(epoch):
         print(e)
-        # shuffle data
-        x_temp, y_temp = x_train, y_train
         # if shuffle:
-        #     x_temp, y_temp = shuffle(x_train, y_train)
+        #     #np.random.seed(seed=57)
+        #     np.random.shuffle(x_train)
+        #     np.random.shuffle(y_train)
 
         total_loss = 0
         for i in range(full_set):
-            X, y = x_temp[i * batch_size: i * batch_size + batch_size], y_temp[i * batch_size: i * batch_size + batch_size]
+            X, y = x_train[i * batch_size: i * batch_size + batch_size], y_train[i * batch_size: i * batch_size + batch_size]
             loss, w1, w2, w3, w4 = four_nn(X, w1, w2, w3, w4, b1, b2, b3, b4, y, False)
             total_loss += loss
         losses[e] = total_loss
@@ -69,21 +119,29 @@ def minibatch_gd(epoch, w1, w2, w3, w4, b1, b2, b3, b4, x_train, y_train, num_cl
 """
 def test_nn(w1, w2, w3, w4, b1, b2, b3, b4, x_test, y_test, num_classes):
 
-    num_examples = len(x_test)
-    batch_size = 200
-    full_set = (int) (num_examples / batch_size)
-    corrects = 0
     class_rate_per_class = [0.0] * num_classes
     avg_class_rate = 0
 
+    size_per_class = 0
+    for class_type in y_test:
+        if class_type == 1:
+            size_per_class += 1
+
+    classifications = four_nn(x_test, w1, w2, w3, w4, b1, b2, b3, b4, y_test, True)
     for i in range(len(x_test)):
-        if i%100==0:
-            print("test #"+str(i)+" correct: "+str(avg_class_rate))
-        res_max = four_nn(x_test, w1, w2, w3, w4, b1, b2, b3, b4, y_test, True)
-        if res_max[i] == y_test[i]:
+        if classifications[i] == y_test[i]:
+            class_rate_per_class[y_test[i]] += 1
             avg_class_rate += 1
 
-    avg_class_rate /= num_classes
+    avg_class_rate /= len(x_test)
+    for i in range(len(class_rate_per_class)):
+        class_rate_per_class[i] /= size_per_class
+
+    class_names = np.array(["0","1","2","3","4","5","6","7","8","9"])
+    plot_confusion_matrix(y_test, classifications, classes=class_names, normalize=True,
+                      title='MNIST 4-Layer NN Confusion Matrix (50 Epoch)')
+    plt.show()
+
     return avg_class_rate, class_rate_per_class
 
 """
